@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FILE UPLOADER</title>
+    
+
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #333;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 40px;
+    width: 400px;
+    text-align: center;
+    color: #fff;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.file-input {
+    padding: 10px;
+    border: 2px solid #555;
+    border-radius: 4px;
+    background-color: #444;
+    color: #ddd;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.file-name {
+    display: block;
+    margin-top: 10px;
+    color: #bbb;
+}
+
+.submit {
+    padding: 10px 20px;
+    background-color: #555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit:hover {
+    background-color: #777;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <h1>FILE UPLOADER</h1>
+            <input type="file" name="file-upload" class="file-input" onchange="document.querySelector('.file-name').textContent = this.files[0].name">
+            <span class="file-name">No file chosen...</span>
+            <button class="submit" type="submit">UPLOAD</button>
+        </form>
+    </div>
+</body>
+</html>
