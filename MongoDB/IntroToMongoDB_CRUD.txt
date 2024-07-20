@@ -1,0 +1,55 @@
+1. What is a NoSQL Database, and explain the types of NoSQL database?
+ans : NoSQL database is used for unstructured data, offering flexibility, ease of use, and efficient storage.
+      Types of NoSQL is  Document , Key-Value pairs , Column-Family, Graph.
+
+
+2. What is the difference between SQL and NoSQL databases?
+ans : SQL Database is Structured Database, fixed schema, requires all values or nulls.
+      NoSQL Database offer Flexible schema, stores only available data.
+
+
+3. How to choose between MongoDB and MySQL based on your requirements?
+ans : Choose MongoDB Database For flexibility and high write loads.
+      Choose MySQL Database For structured transactional data in applications like banking.
+
+
+4. What are collections and documents in a MongoDB database?
+ans : Collections is a Group of documents.
+      Documents is Individual records in a collection stored as JSON-like objects.\
+
+
+5. What is BSON? What is the difference between BSON and JSON? 
+ans : BSON is  Binary JSON more efficient for storage and speed.
+      Difference between two are BSON includes additional data types and is binary; JSON is text-based.
+
+
+6. What are MongoDB Compass and MongoDB Shell used for?
+ans : MongoDB Compass is Graphical User Inferface ( GUI ) for database management.
+      MongoDB Shell: Command-line interface ( CLI ) for interacting with MongoDB.
+
+
+7. How to create collections in MongoDB?
+ans : We Should Use db.createCollection("collectionName")
+
+
+8. What is the difference between insertMany and insertOne?
+ans : insertOne give insert only one data where insertMany can add more than one data in array [] 
+      db.collectionName.insertMany([{},{}])
+
+
+9. What is the difference between deleteOne and deleteMany?
+ans : deleteOne will delete only one item while deleteMany can delete more than one item
+
+
+10. How to read data in MongoDB? What is the difference between find and findOne?
+ans : to read data in mongo data we have to do db.collectionName.find() then it will show all data available in collection
+      but if you want only one data then use db.collectionName.findOne() it will return one data
+      if given condition it will return the first data which match the condition
+
+
+11. What is $set in MongoDB?
+ans : $set in MongoDB is to update data , if key value is available it will update it otherwise it will create new data and will add it 
+
+
+12. How to filter data using MongoDB?
+ans : filtering in MongoDB , lets say if i want everyone whose age is above 18 so i can do db.collectionName.find({age : {$gte : 18}}) 

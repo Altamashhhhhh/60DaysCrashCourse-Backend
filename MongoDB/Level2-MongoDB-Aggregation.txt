@@ -1,0 +1,53 @@
+1. Write Mongo query to retrieve the documents from the orders where the customer_id is 1.
+ans.  db.orders.aggregate([{$match : {customer_id : 1}}])
+
+2. Write Mongo query to retrieve documents from the products where supplier_id is 3 .
+ans. db.products.aggregate([{$match : {supplier_id : 3}}])
+
+3. Write Mongo query to retrieve the documents from the orders collection with "status": "shipped" .
+ans. db.orders.aggregate([{$match : {status : "shipped"}}])
+
+4. Write Mongo query to retrieve the amount and paymentMethod from payments where the paymentMethod is not UPI.
+ans.  db.payments.aggregate([{$match : {paymentMethod : {$ne : "UPI"}}} , {$project : {amount : 1 , paymentMethod : 1}}])
+
+5. Write Mongo query to retrieve the paymentstatus where the amount is greater than 100.
+ans. db.payments.aggregate([{$match : {amount : {$gt : 100}}}, {$project : {paymentstatus : 1}}])
+
+6. Write Mongo query to retrieve the shipper_id and price from the order_details where the price is greater than 2000.
+ans. db.order_details.aggregate([{$match : {price : {$gt : 2000}}} , {$project : {shipper_id : 1 , price : 1}}])
+
+7. Write Mongo query to retrieve the customer_id and _id from the orders where the status is not shipped.
+ans. db.orders.aggregate([{$match : {status : {$ne : "shipped"}}} , {$project : {customer_id : 1 , _id : 1 }}])
+
+8. Write Mongo query to retrieve documents from the products where category_id is 1 with out product _id.
+ans. db.products.aggregate([{$match : {category_id : 1}}, {$project : {product_id : 0}}])
+
+9. Write Mongo query to retrieve name,quantity from the products where price greater than 1500 .
+ans. db.products.aggregate([{$match : {price : {$gt : 1500}}}, {$project : {name : 1 , quantity : 1}}])
+
+10. Write Mongo query to retrieve the name from the shippers where the phone number is 1-800-742-5877.
+ans. db.shippers.aggregate([{$match : {phone : "1-800-742-5877"}}, {$project : {name : 1}}])
+
+11. Write Mongo query to retrieve the city and phone of the suppliers where the suppliers name is Sony.
+ans. db.suppliers.aggregate([{$match : {name : "Sony"}}, {$project : {city : 1 , phone : 1}}])
+
+12. Write Mongo query to retrieve the name of the suppliers where the city is Tokyo.
+ans. db.suppliers.aggregate([{$match : {city : "Tokyo"}}, {$project : {name : 1}}])
+
+13. Write Mongo query to find amount of payment made through "UPI" ?
+ans.  db.payments.aggregate([{$match : {paymentMethod : "UPI"}}, {$group : {_id : null , totalAmount : {$sum : "$amount"}}}, {$project : {_id : 0}}])
+
+14. Write Mongo query to find buyers city as key name "city" who uses hotmail ?
+ans. db.buyers.aggregate([{$match : {email : {$regex : /hotmail\.com$/i}}} , {$project : {city : "$address.city"}}])
+
+15. Use MongoDB aggregation to retrieve the top 5 most recent orders that have been shipped, projecting the order date, status, and total amount.
+ans. db.orders.aggregate([{$match : {status : "shipped"}} , {$sort : {order_date : -1}} , {$limit : 5} , {$project : {order_date : 1 , status : 1 , total : 1}}])
+
+16. Aggregate the first 3 payments with a "success" status, projecting the payment date, amount, and method.
+ans.  db.payments.aggregate([{$match : {paymentstatus : "success"}} , {$limit : 3} , {$project : {payment_date : 1 , amount : 1 , paymentMethod : 1 }}])
+
+17. Aggregate all pending orders, sort them by the order date in descending order, and project the customer ID, order date, and total amount.
+ans. db.orders.aggregate([{$match : {status : "pending"}} , {$sort : {order_date : -1}} , {$project : {customer_id : 1 , order_date : 1, total : 1 }}])
+
+18. Aggregate products, sort them by quantity in descending order, limit the result to the top 10 items, and project the product name and quantity.
+ans. db.products.aggregate([{$sort : {quantity : -1}} , {$limit : 10} , {$project : {name : 1 , quantity : 1 }}])

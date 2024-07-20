@@ -1,0 +1,78 @@
+1. Write Mongo query to retrieve documents from the orders in ascending order by total.
+ans.  db.orders.aggregate([{$sort : {total : 1}}])
+
+2. Write Mongo query to retrieve the oldest paymentMethod from the payments collection as "_id".
+ans. db.payments.aggregate([{$sort : {payment_date : 1}} , {$limit : 1} , {$project : {_id : "$paymentMethod"}}])
+
+3. Write Mongo query to retrieve 2nd and 3rd buyers from the buyers collection.
+ans. db.buyers.aggregate([{$skip : 1} , {$limit : 2}])
+
+4. Write Mongo query to retrieve the most Expensive product from order_details.
+ans. db.order_details.aggregate([{$sort : {price : -1}} , {$limit : 1}])
+
+5. Write Mongo query to retrieve the first order from the orders as per the order_date.
+ans. db.orders.aggregate([{$sort : {order_date : 1 }} , {$limit : 1}])
+
+6. Write Mongo query to retrieve the last 3 orders from the orders collection who have less total amount.
+ans. db.orders.aggregate([{$sort : {total : 1}} , {$limit : 3}])
+
+7. Write Mongo query to retrieve the most recent shipped order from the orders collection.
+ans. db.orders.aggregate([{$match : {status : "shipped"}}, {$sort : {order_date : -1}} , {$limit : 1}])
+
+8. Write Mongo query to get the total revenue from all orders
+ans.  db.orders.aggregate([{$group : {_id : null , totalRevanue : {$sum : "$total"}}} , {$project : {_id : 0}}])
+
+9. Write Mongo query to retrieve all the orders that shipped before 2022-05-26
+ans. db.orders.aggregate([{$match : {status : "shipped" , order_date : {$lt : "2022-05-26"}}}])
+
+10. Write Mongo query to find the maximum price as maxPrice of products and their names as name for each category.
+ans. db.products.aggregate([{$sort : {price : -1}} , {$group : {_id : "$category_id" , maxPrice : {$first : "$price" }, names : {$first : "$name"} }}])
+
+11. Write Mongo query to find Most used payment Method as paymentMethod and the number of time it is used as count.
+ans. db.payments.aggregate([{$group : {_id : "$paymentMethod" ,count : {$count : {}} }} , {$sort : {count : -1}} , {$project : {paymentMethod : "$_id" , _id : 0 , count : 1}}])
+
+12. Write Mongo query to find the total count of orders by status.
+ans. db.orders.aggregate([{$group : {_id : "$status" , count : {$count : {}}}} , {$project : {count : 1 ,  status : "$_id" , _id : 0 }}])
+
+13. Write Mongo query to retrieve the orders grouped by customer_id with the max total
+ans.  db.orders.aggregate([{$group : {_id : "$customer_id" , maxTotal : {$sum : "$total"}}} , {$project : {customer_id : "$_id" , _id : 0 , maxTotal : 1 }}])
+
+14.Assess the impact of RAM capacity on laptop prices and ratings. Group laptops by RAM capacity and analyze the average price and rating for each group. Identify any significant trends or outliers.
+ans. db.laptops.aggregate([{$group : {_id : "$ram_memory" , avgPrice : {$avg : "$Price"},avgRating : {$avg : "$Rating"} }} , {$project : {ram_capacity : "$_id" , _id : 0 , avgPrice : 1 , avgRating : 1}}])
+
+EXPLANATION : Laptops with higher RAM capacities, such as 32GB, exhibit significantly higher prices (around 134,990) and ratings (76.33), 
+reflecting their premium status for high-performance tasks. In contrast, 2GB RAM laptops are the most budget-friendly (average price of 9,800) 
+but have lower ratings (41). 4GB RAM laptops are the least expensive and lowest rated, while 12GB and 8GB RAM models offer a balance between cost and performance, 
+with prices and ratings improving with higher RAM. This trend highlights that higher RAM generally results in better performance and higher cost, 
+with 32GB models standing out as high-end outliers.
+
+
+
+15.Investigate the price and rating distribution for gaming laptops. Identify which brands are leading in the gaming laptop market by comparing the average price, rating, GPU type, and RAM capacity for laptops categorized as gaming.
+ans. db.laptops.aggregate([{$match : {gpu_type : "dedicated"}} , {$group : {_id : "$brand" ,avgPrice : {$avg : "$Price"} , avgRating : {$avg : "$Rating"} , avgRam : {$avg : "$ram_memory"}}}])
+
+EXPLANATION : In the gaming laptop market, Asus leads with the highest average price (101,824.5) and rating (75.375), reflecting its premium positioning and strong performance. 
+MSI follows with a competitive average price (61,621.67) and rating (70.33), highlighting its value for high-performance gaming. 
+HP also stands out with a high average rating (73.18) and a significant average price (77,927.53). 
+Acer and Dell offer strong options with high RAM capacities (16GB) and competitive ratings, though their prices are slightly lower compared to Asus and HP. 
+Lenovo provides more affordable gaming laptops with a decent rating (67.67) and average price (56,289.67), making it a solid choice for budget-conscious gamers.
+
+
+16.Analyze the warranty periods offered by different brands and their correlation with laptop prices and ratings. Identify any patterns or insights regarding how warranty periods influence consumer ratings and pricing strategies.
+ans.  db.laptops.aggregate([{$group : {_id : "$brand" , warrenty : {$avg : "$year_of_warranty"} , price : {$avg : "$Price"} , Rating : {$avg : "$Rating"}}}])
+
+EXPLANATION : The data reveals that Apple laptops have the highest average price at 173,467.5 but a relatively low rating of 52.75. 
+HP and ASUS also have high average prices at 70,351.42 and 74,146.53, respectively, with ratings of 69.5 and 68.47. 
+Dell laptops are priced at 64,642.25 with a rating of 66.38. MSI offers a higher warranty period (1.67 years) and maintains a balanced price of 57,954.29 with a rating of 68.57. 
+In contrast, brands like Primebook, iBall, and Wings are more budget-friendly, with prices at 14,990, 9,800, and 27,990, respectively, 
+but have lower ratings. Tecno offers a balance with a price of 29,990 and a rating of 65.
+
+
+
+17.Examine the relationship between processor brand (Intel, AMD, Apple) and laptop price, rating, and primary storage capacity. Group the laptops by processor brand and compare their average price, rating, and storage statistics to identify key differences.
+ans. db.laptops.aggregate([{$group : {_id : "$processor_brand"  , avgPrice : {$avg : "$Price"} , avgRating : {$avg : "$Rating"} , avgStorage : {$avg : "$primary_storage_capacity"}}}])
+
+EXPLANATION : From the data, Apple laptops have the highest average price at 173,467.5 and a lower average rating of 52.75, with an average storage capacity of 448 GB. 
+AMD laptops are more moderately priced at 54,411.57, with a higher average rating of 67.39 and average storage of 545.39 GB. 
+Intel laptops have an average price of 59,977.60, an average rating of 64.66, and average storage of 590.81 GB. 
+Other brands have the lowest average price of 14,990, with an average rating of 26 and storage of 64 GB, indicating they are more budget-friendly but less favored by consumers.
