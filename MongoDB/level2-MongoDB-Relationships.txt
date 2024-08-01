@@ -16,59 +16,124 @@ ans. db.sales.aggregate([{$group : {_id : "$employee_id" , totalCount : {$sum : 
 3 Retrieve a list of departments with more than 10 employees
 ans. db.employees.aggregate([
         {$group : {_id : "$department_id" , count : {$sum : 1}} } , 
-        {$match : {count : {$gt : 5}}} , 
+        {$match : {count : {$gt : 10}}} , 
         {$lookup : {from : "departments"  , localField : "_id" , foreignField : "_id" , as : "department"}} , 
         {$unwind : "$department"} , 
         {$project :{_id : 0 , name :  "$department.name" } }])
         
 
 4 Find the employees who have worked in the company for more than 5 years
-ans.
+ans.  db.employees.aggregate([
+        {$project : { name : 1 , _id : 0  ,  "yoe" : 
+        {$divide : [ {$subtract : [new Date() , 
+        { "$dateFromString" : { "dateString" : "$hire_date" } } ] }  , 1000 * 60 * 60 * 24 * 365 ]  } }} , 
+        {$match : {yoe : {$gt : 5}}}])  
 
 5 Find the employee with the highest salary
-ans.
+ans.    db.employees.aggregate([{$sort : {salary : -1 }} , {$limit : 1} ,  {$project : {name : 1 , salary : 1 , _id : 0 }}])
 
 6 List the names and ages of employees in the "HR" department
-ans.
+ans.    db.employees.aggregate([{
+        $lookup : {from : "departments" , localField : "department_id" , "foreignField" : "_id" , as : "department"}} , 
+        {$match : {"department.name" : "HR" }} , 
+        {$project : {name : 1 , age : 1 , _id : 0}}])
 
 7 Retrieve the names of employees who have worked on the "Employee Management System" project
-ans.
+ans.    db.projects.aggregate([
+        {$match : { name : "Employee Management System" }} ,  
+        {$lookup : { from : "employees" , localField : "_id" , foreignField : "projects" , as : "employee" }   } , 
+        {$project : {"employee.name" : 1 , _id : 0}}])
 
 8 Find the employees who have not made any sales
-ans.
+ans. db.employees.aggregate([{$lookup : {from : "sales" , localField : "_id" , foreignField : "employee_id"  , as : "sales"}} , 
+        {$match : { "sales.0" : {"$exists" : false }} } , 
+        {$project : {name : 1 , _id : 0 }} ])
 
 9 List the names of employees who have made a sale in September 2023
-ans.
+ans.    db.sales.aggregate([{$match : {"sale_date" :{"$gte" : "2023-09-01" , "$lte" : "2023-09-30" }  ,   }} , 
+        {$lookup : {from : "employees" , localField :  "employee_id"  , "foreignField" : "_id" ,  as : "employees"    }} , 
+        {$unwind : "$employees"} , 
+        {$project : {"employee_name" :  "$employees.name"  , _id : 0  }}])
 
 10 Find the departments where the average employee age is greater than 35
-ans.
+ans. db.employees.aggregate([
+        {$group : {_id : "$department_id" , avgAge : {$avg : "$age"}}} , 
+        {$match : {avgAge : {$gt : 35}}} , 
+        {$lookup : {from : "departments" , localField :  "_id" , "foreignField" : "_id" , as : "department"}} , 
+        {$unwind : "$department"}   , 
+        {$project : {_id : 0 , "department" : "$department.name" , AverageAge : "$avgAge"}}])
 
 11 Find the employees who have worked on at least three different projects
-ans.
+ans. db.employees.aggregate([
+        {$project : {_id : 0 , name : 1 , "totalProject" : {$size : "$projects"} }} , 
+        {$match : {totalProject : {$gte : 3}}}])
 
 12 List the names of employees who have not been assigned to any project
-ans.
+ans.  db.employees.aggregate([
+        {$project : {_id : 0 , name : 1 , "totalProject" : {$size : "$projects"} }} , 
+        {$match : {totalProject : {$lt : 1}}}])
 
 13 Find the employees who have worked on projects from multiple departments
-ans.
+ans. db.employees.aggregate([ 
+        { $lookup: { from: "projects", localField: "projects", foreignField: "_id", as: "projectDetails" } }, 
+        { $unwind: "$projectDetails" }, 
+        { $group: { _id: "$_id", departmentIds: { $addToSet: "$projectDetails.department" } } }, 
+        { $match: { "departmentIds.1": { $exists: true } } }, 
+        { $lookup: { from: "employees", localField: "_id", foreignField: "_id", as: "employee" } }, 
+        { $unwind: "$employee" }, { $project: { employee_name: "$employee.name" } }] )
 
 14 Find the employees who have the highest sales amount in a single sale
-ans.
+ans. db.sales.aggregate([{$sort : { amount : -1}   } , 
+        {$limit : 3 } , 
+        {$lookup : { from : "employees" , localField : "employee_id" , foreignField : "_id" , as : "employee"   } } , 
+        {$unwind : "$employee"} , 
+        {$project : { "name" :  "$employee.name"  , _id : 0  , amount : 1 } }])
 
 15 Retrieve the names of employees who have not made a sale in the last 90 days
-ans.
+ans. db.employees.aggregate([ 
+        { $lookup: { from: "sales", localField: "_id", foreignField: "employee_id", as: "sales" } }, 
+        { $addFields: { lastSaleDate: { $max: "$sales.sale_date" } } }, 
+        { $match: { $or: [ { lastSaleDate: { $exists: false } }, 
+        { lastSaleDate: { $lt: new Date(new Date().setDate(new Date().getDate() - 90)) } } ] } }, 
+        { $project: { name: 1 } } ])
 
 16 Find the departments where the total employee salaries exceed $500,000
-ans.
+ans. db.employees.aggregate([
+        {$group : {_id : "$department_id" , totalSum : {$sum : "$salary"} }} , 
+        {$lookup : {from : "departments" , localField : "_id" , foreignField :  "_id"  , as : "department"}} , 
+        {$unwind : "$department"} , {$match : {totalSum : {$gt : 50000}} } ,
+         {$project : { "department" : "$department.name" , totalSum : 1 , _id : 0}  }])
 
 17 List the employees who have worked on the "Payroll Software" project and are older than 35
-ans.
+ans.  db.projects.aggregate([
+        {$match : {name : "Payroll Software"}} , 
+        {$lookup : { from : "employees" , localField : "_id" , foreignField : "projects" , as : "employee"} } , 
+        {$unwind : "$employee"} , \
+        {$match  : {"employee.age" : {$gt : 35}} } , 
+        {$project : { "employee_name" : "$employee.name" ,  "age"  : "$employee.age"  , _id : 0  }}])
 
 18 Find the total number of sales and the total sales amount for each employee in the "HR" department
-ans.
+ans. db.departments.aggregate([
+        {$match : { name : "HR" }} , 
+        {$lookup : { from : "employees" , localField : "_id" , foreignField : "department_id" , as : "employees"} } , 
+        {$unwind : "$employees"} , 
+        {$lookup : {from : "sales" , localField : "employees._id" , foreignField : "employee_id" , as : "sales" }}  , 
+        {$addFields: { totalNumberOfSales : {$size : "$sales"} , totalAmount : {$sum : "$sales.amount"} }  } , 
+        {$project : { "employee_name" : "$employees.name" , totalNumberOfSales : 1 , totalAmount : 1  , _id : 0   , "department" : "$name" } }])
 
 19 List the employees who have not been assigned to any project in the "Finance" department
-ans.
+ans. db.employees.aggregate([
+        {$lookup : { from : "departments" , localField :  "department_id"  , foreignField : "_id" , as : "department" } } , 
+        {$unwind : "$department"} , 
+        {$match : { "department.name" : "Finance" , projects : {$exists : true , $eq : [] } } }  , 
+        {$project : {_id : 0  , name : 1 , "department" : "$department.name" }  }  ])
 
 20 List the employees who have worked on all projects in the "Engineering" department
-ans.
+ans. const engineeringProjects = db.projects.aggregate([
+         { $match: { department: 103 } }, 
+         { $group: { _id: null, allProjectIds: { $addToSet: "$_id" } } } ]).toArray()[0].allProjectIds;
+        db.employees.aggregate([ 
+        { $match: { department_id: 103 } }, { $addFields: { matchedProjectIds: 
+        { $filter: { input: "$projects", as: "projId", cond: { $in: ["$$projId", engineeringProjects] } } } } }, 
+        { $addFields: { hasAllProjects: { $eq: [ { $size: "$matchedProjectIds" }, engineeringProjects.length ] } } }, 
+        { $match: { hasAllProjects: true } }, { $project: { name: 1 } } ]).pretty();
