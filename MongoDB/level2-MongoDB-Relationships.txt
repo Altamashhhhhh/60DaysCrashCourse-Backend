@@ -1,0 +1,74 @@
+1 Find the names of employees who work in the "Finance" department and have made sales on or after "2023-09-16.
+ans. 
+        db.employees.aggregate([{
+                $lookup : {from : "departments" , localField : "department_id" , foreignField : "_id" , as : "department" }} , 
+                {$match : { "department.name" : "Finance"}} , 
+                {$lookup : {from : "sales" , localField : "_id" ,foreignField : "employee_id" , as : "sales" }} , 
+                {$unwind : "$sales"} , 
+                {$match : {"sales.sale_date" : {$gte : "2023-09-16"}}} , 
+                {$project : {_id : 0 , name : 1}}])
+
+
+2 Find the total sales count and total sales amount for each employee who has made a sale, and sort the results by total sales amount in descending order.
+
+ans. db.sales.aggregate([{$group : {_id : "$employee_id" , totalCount : {$sum : 1} , totalSales : {$sum : "$amount"}}}, {$sort : {totalSales : -1}}, {$project : {employee_id : "$_id" , _id : 0 , totalCount : 1 , totalSales : 1}}])
+
+3 Retrieve a list of departments with more than 10 employees
+ans. db.employees.aggregate([
+        {$group : {_id : "$department_id" , count : {$sum : 1}} } , 
+        {$match : {count : {$gt : 5}}} , 
+        {$lookup : {from : "departments"  , localField : "_id" , foreignField : "_id" , as : "department"}} , 
+        {$unwind : "$department"} , 
+        {$project :{_id : 0 , name :  "$department.name" } }])
+        
+
+4 Find the employees who have worked in the company for more than 5 years
+ans.
+
+5 Find the employee with the highest salary
+ans.
+
+6 List the names and ages of employees in the "HR" department
+ans.
+
+7 Retrieve the names of employees who have worked on the "Employee Management System" project
+ans.
+
+8 Find the employees who have not made any sales
+ans.
+
+9 List the names of employees who have made a sale in September 2023
+ans.
+
+10 Find the departments where the average employee age is greater than 35
+ans.
+
+11 Find the employees who have worked on at least three different projects
+ans.
+
+12 List the names of employees who have not been assigned to any project
+ans.
+
+13 Find the employees who have worked on projects from multiple departments
+ans.
+
+14 Find the employees who have the highest sales amount in a single sale
+ans.
+
+15 Retrieve the names of employees who have not made a sale in the last 90 days
+ans.
+
+16 Find the departments where the total employee salaries exceed $500,000
+ans.
+
+17 List the employees who have worked on the "Payroll Software" project and are older than 35
+ans.
+
+18 Find the total number of sales and the total sales amount for each employee in the "HR" department
+ans.
+
+19 List the employees who have not been assigned to any project in the "Finance" department
+ans.
+
+20 List the employees who have worked on all projects in the "Engineering" department
+ans.
