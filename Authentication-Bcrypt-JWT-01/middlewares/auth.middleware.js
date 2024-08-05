@@ -2,7 +2,7 @@ const express = require("express")  ;
 const jwt = require("jsonwebtoken") ; 
 
 const auth = (req,res,next)=>{
-    let token = req.query.token ; 
+    let token = req.headers.authorization.split(" ")[1] ; 
 
     jwt.verify(token , process.env.SECRET_KEY  , function(err , decode){
         if(err){
