@@ -1,22 +1,23 @@
-const express = require("express") ; 
-const morganLogger = require("./middleware/morganLogger") 
-const userModel = require("./models/users") ; 
-const courseModel = require("./models/course")
+const express = require("express")
+const dotenv = require("dotenv").config() ;
+const connection = require("./config/db") 
+const userRouter = require("./routes/user.route")
 
-const app = express() ;
-app.use(express.json()) 
-app.use(morganLogger)
+const app = express() ; 
+const port = process.env.PORT ; 
 
-const port = 3001 ; 
+app.use(express.json())
+app.use("/user" , userRouter )
 
-app.get("/courses" ,async (req , res)=>{
-    let courses = await   courseModel.find() ;
-    // let parsedData = JSON.parse(courses)
 
-    res.status(201).send(courses)
+app.get("/" , (req,res)=>{
+    res.send("server is runnnig now ")
 })
 
-
 app.listen(port , ()=>{
-    console.log(`port ${port} is running ......`)
+    try{
+        console.log("server is running now ")
+    }catch(err){
+        console.log(`error while running server and connecting to databse : ${err}`)
+    }
 })
