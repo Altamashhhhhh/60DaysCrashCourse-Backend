@@ -1,7 +1,7 @@
 const connection = require("./config/db");
 const express = require("express") ; 
-const authRoute = require("./routes/auth.route") ; 
-const prodRouter = require("./routes/product.route")
+const authRoute = require("./routes/auth.route") ;  // this route is for login register 
+const prodRouter = require("./routes/product.route") // this route is for products
 
 const app = express() ;
 const port = process.env.PORT || 3001 ;
